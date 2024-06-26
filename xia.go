@@ -3,6 +3,8 @@ package xia
 import (
 	"net/http"
 	"strings"
+
+	"github.com/xia/xlog"
 )
 
 type HandlerFunc func(c *Context)
@@ -102,7 +104,13 @@ func New() *Xia {
 	}
 	xiaWuYue.RouterGroup = &RouterGroup{xia: xiaWuYue}
 	xiaWuYue.groups = []*RouterGroup{xiaWuYue.RouterGroup}
+	g := xiaWuYue.Group("/")
+	g.Use(TimeLogger)
 	return xiaWuYue
+}
+
+func (x *Xia) SET(method, pattern string, handler HandlerFunc) {
+	x.router.addRouter(method, pattern, handler)
 }
 
 func (x *Xia) GET(pattern string, handler HandlerFunc) {
@@ -146,7 +154,7 @@ func (x *Xia) ServerStart() {
 		// 设置默认启动地址
 		x.addr = ":9999"
 	}
-
+	xlog.Infof("listen localhost %s", x.addr)
 	http.ListenAndServe(x.addr, x)
 }
 
