@@ -35,17 +35,17 @@ const (
 
 func InitLoger(logFilePath string) {
 	if logFilePath == "" {
-		errorLog = log.New(os.Stdout, "\033[31m[error]\033[0m ", log.LstdFlags|log.Lshortfile)
-		debugLog = log.New(os.Stdout, "\033[32m[debug]\033[0m ", log.LstdFlags|log.Lshortfile)
-		infoLog = log.New(os.Stdout, "\033[34m[info]\033[0m ", log.LstdFlags|log.Lshortfile)
+		errorLog = log.New(os.Stdout, fmt.Sprintf("\033[%sm[error]\033[0m ", colorRed), log.LstdFlags|log.Lshortfile)
+		debugLog = log.New(os.Stdout, fmt.Sprintf("\033[%sm[debug]\033[0m ", colorGreen), log.LstdFlags|log.Lshortfile)
+		infoLog = log.New(os.Stdout, fmt.Sprintf("\033[%sm[info]\033[0m ", colorBlue), log.LstdFlags|log.Lshortfile)
 	} else {
 		logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			log.Fatalf("Failed to open log file: %v", err)
 		}
-		errorLog = log.New(logFile, "\033[31m[error]\033[0m ", log.LstdFlags|log.Lshortfile)
-		debugLog = log.New(logFile, "\033[32m[debug]\033[0m ", log.LstdFlags|log.Lshortfile)
-		infoLog = log.New(logFile, "\033[34m[info]\033[0m ", log.LstdFlags|log.Lshortfile)
+		errorLog = log.New(logFile, fmt.Sprintf("\033[%sm[error]\033[0m ", colorRed), log.LstdFlags|log.Lshortfile)
+		debugLog = log.New(logFile, fmt.Sprintf("\033[%sm[debug]\033[0m ", colorGreen), log.LstdFlags|log.Lshortfile)
+		infoLog = log.New(logFile, fmt.Sprintf("\033[%sm[info]\033[0m ", colorBlue), log.LstdFlags|log.Lshortfile)
 	}
 }
 
