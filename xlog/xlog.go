@@ -7,6 +7,9 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
+
+	"github.com/xia/xconfig"
 )
 
 var (
@@ -35,18 +38,53 @@ const (
 
 func InitLoger(logFilePath string) {
 	if logFilePath == "" {
-		errorLog = log.New(os.Stdout, fmt.Sprintf("\033[%sm[error]\033[0m ", colorRed), log.LstdFlags|log.Lshortfile)
-		debugLog = log.New(os.Stdout, fmt.Sprintf("\033[%sm[debug]\033[0m ", colorGreen), log.LstdFlags|log.Lshortfile)
-		infoLog = log.New(os.Stdout, fmt.Sprintf("\033[%sm[info]\033[0m ", colorBlue), log.LstdFlags|log.Lshortfile)
+		errorLog = log.New(os.Stdout, "\033[31m[error]\033[0m ", log.LstdFlags|log.Lshortfile)
+		debugLog = log.New(os.Stdout, "\033[32m[debug]\033[0m ", log.LstdFlags|log.Lshortfile)
+		infoLog = log.New(os.Stdout, "\033[34m[info]\033[0m ", log.LstdFlags|log.Lshortfile)
 	} else {
 		logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			log.Fatalf("Failed to open log file: %v", err)
 		}
-		errorLog = log.New(logFile, fmt.Sprintf("\033[%sm[error]\033[0m ", colorRed), log.LstdFlags|log.Lshortfile)
-		debugLog = log.New(logFile, fmt.Sprintf("\033[%sm[debug]\033[0m ", colorGreen), log.LstdFlags|log.Lshortfile)
-		infoLog = log.New(logFile, fmt.Sprintf("\033[%sm[info]\033[0m ", colorBlue), log.LstdFlags|log.Lshortfile)
+		errorLog = log.New(logFile, "\033[31m[error]\033[0m ", log.LstdFlags|log.Lshortfile)
+		debugLog = log.New(logFile, "\033[32m[debug]\033[0m ", log.LstdFlags|log.Lshortfile)
+		infoLog = log.New(logFile, "\033[34m[info]\033[0m ", log.LstdFlags|log.Lshortfile)
 	}
+}
+
+func InitLogerProject(conf *xconfig.WeConfig) {
+	logPath, _ := conf.GetValue("project", "logpath")
+	projname, _ := conf.GetValue("project", "project")
+	logFile := fmt.Sprintf("%s%s_%s", logPath, projname, time.Now().Format("2006-01-02"))
+	InitLoger(logFile)
+	go func() {
+		for {
+			now := time.Now()
+			nextMidnight := now.Add(24 * time.Hour)
+			midnightTime := nextMidnight.Truncate(24 * time.Hour)
+
+			duration := midnightTime.Sub(now)
+			if duration < 0 {
+				duration += 24 * time.Hour
+			}
+
+			time.Sleep(duration)
+
+			currentDate := time.Now().Format("2006-01-02")
+			newLogFilePath := fmt.Sprintf("%s%s_%s", logPath, projname, currentDate)
+
+			logFile, err := os.OpenFile(newLogFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+			if err != nil {
+				log.Fatalf("Failed to open new log file: %v", err)
+			}
+
+			errorLog.SetOutput(logFile)
+			debugLog.SetOutput(logFile)
+			infoLog.SetOutput(logFile)
+
+			Infof("日志文件已切换到: %s\n", newLogFilePath)
+		}
+	}()
 }
 
 // 文件写入后续优化可以改为 mmap 写入  不用 write file  效率会更高

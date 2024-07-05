@@ -85,7 +85,7 @@ func (c *Context) Fail(code int, format string, values ...interface{}) {
 }
 
 func (c *Context) JSON(code int, obj interface{}) {
-	c.SetHeader("Content-Type", "application/json")
+	c.SetHeader("Content-Type", "application/json; charset=UTF-8")
 	c.Status(code)
 	encoder := json.NewEncoder(c.Writer)
 	if err := encoder.Encode(obj); err != nil {
@@ -106,6 +106,10 @@ func (c *Context) HTML(code int, html string) {
 	c.Writer.Write([]byte(html))
 }
 
+func (c *Context) WriteTpl(t *BuildTemplate, filename string, data ResponseXia) {
+	t.WriterBuffer(c.Writer, filename, data)
+}
+
 // 将form写入 struct
 
 func (c *Context) FormUnmarshal(data interface{}) error {
@@ -114,6 +118,7 @@ func (c *Context) FormUnmarshal(data interface{}) error {
 }
 
 func (q *QiuWu) Unmarshal(data interface{}) error {
+
 	// 非结构体的情况
 	switch data.(type) {
 	case *map[string][]string:

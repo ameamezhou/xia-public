@@ -54,11 +54,23 @@ func load(path string) (*WeConfig, error) {
 		}
 
 		if _, ok := theSections[tempSection]; ok {
-			kvSlice := strings.Split(line, "=")
-			if len(kvSlice) != 2 {
-				return nil, fmt.Errorf("config file error, key value need use '=', just one '='")
+			eqindex := strings.Index(line, "=")
+			if eqindex == -1 {
+				return nil, fmt.Errorf("config file error, key value need use '='!")
 			}
-			theSections[tempSection].keyValue[strings.TrimSpace(kvSlice[0])] = strings.TrimSpace(kvSlice[1])
+			key := strings.TrimSpace(line[0:eqindex])
+			value := strings.TrimSpace(line[eqindex+1:])
+			if len(value) > 2 {
+				if value[0] == '"' || value[0] == '\'' {
+					value = value[1:]
+				}
+				l := len(value)
+				if value[l-1] == '"' || value[l-1] == '\'' {
+					value = value[:l-1]
+				}
+			}
+
+			theSections[tempSection].keyValue[key] = strings.TrimSpace(value)
 		}
 	}
 	return &WeConfig{

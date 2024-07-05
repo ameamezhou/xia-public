@@ -74,15 +74,11 @@ func (t *Trie) buildMap() map[string]*Trie {
 
 // 模糊匹配   /xxx/xxx/:zhou   /xxx/xxx/xxx/*
 
-func (t *Trie) insert(parts []string, path string, depth int) error {
-	if depth == len(parts) || t.Part == "*" {
-		if t.Path != "" {
-			if t.Path == path {
-				return fmt.Errorf("path: %s is exist. please check and update ~", path)
-			}
-		}
+func (t *Trie) insert(parts []string, path string, depth int) {
+	if depth == len(parts) {
+
 		t.Path = path
-		return nil
+		return
 	}
 	var nextT *Trie
 	part := parts[depth]
@@ -91,11 +87,10 @@ func (t *Trie) insert(parts []string, path string, depth int) error {
 	if nextT == nil {
 		nextT = NewTrie()
 		nextT.Part = part
-		nextT.isFuzzy = part == "*" || strings.HasPrefix(part, ":")
+		nextT.isFuzzy = strings.HasPrefix(part, "*") || strings.HasPrefix(part, ":")
 		t.children = append(t.children, nextT)
-		return nextT.insert(parts, path, depth+1)
 	}
-	return nextT.insert(parts, path, depth+1)
+	nextT.insert(parts, path, depth+1)
 }
 
 func (t *Trie) GetAllPath() {
@@ -118,7 +113,7 @@ func (t *Trie) searchPath(parts []string, depth int, params interface{}) (*Trie,
 	if params != nil {
 		switch params.(type) {
 		case *map[string]string:
-			if t.isFuzzy && strings.HasPrefix(t.Part, ":") {
+			if t.isFuzzy && (strings.HasPrefix(t.Part, ":") || strings.HasPrefix(t.Part, "*")) {
 				(*params.(*map[string]string))[t.Part[1:]] = parts[depth-1]
 			}
 		default:

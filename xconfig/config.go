@@ -1,7 +1,6 @@
 package xconfig
 
 import (
-	"fmt"
 	"strconv"
 	"sync"
 )
@@ -19,53 +18,53 @@ type weSection struct {
 }
 
 // GetValueInt out put int type
-func (c *WeConfig) GetValueInt(section string, key string) (int, error) {
+func (c *WeConfig) GetValueInt(section, key string, def int) int {
 	c.lock.Lock()
 	if _, ok := c.sections[section]; !ok {
-		return 0, fmt.Errorf("the section %s not exit! please check the input", section)
+		return def
 	}
 
 	if _, ok := c.sections[section].keyValue[key]; !ok {
-		return 0, fmt.Errorf("the key %s not exit! please check the input", key)
+		return def
 	}
 	result := c.sections[section].keyValue[key]
 	c.lock.Unlock()
 	i, e := strconv.Atoi(result)
 	if e != nil {
-		return 0, e
+		return def
 	}
-	return i, nil
+	return i
 }
 
 // GetValue default get value, out put string
-func (c *WeConfig) GetValue(section string, key string) (string, error) {
+func (c *WeConfig) GetValue(section, key, def string) string {
 	c.lock.Lock()
 	if _, ok := c.sections[section]; !ok {
-		return "", fmt.Errorf("the section %s not exit! please check the input", section)
+		return def
 	}
 
 	if _, ok := c.sections[section].keyValue[key]; !ok {
-		return "", fmt.Errorf("the key %s not exit! please check the input", key)
+		return def
 	}
 	result := c.sections[section].keyValue[key]
 	c.lock.Unlock()
-	return result, nil
+	return result
 }
 
-func (c *WeConfig) GetValueFloat64(section string, key string) (float64, error) {
+func (c *WeConfig) GetValueFloat64(section, key string, def float64) float64 {
 	c.lock.Lock()
 	if _, ok := c.sections[section]; !ok {
-		return 0, fmt.Errorf("the section %s not exit! please check the input", section)
+		return def
 	}
 
 	if _, ok := c.sections[section].keyValue[key]; !ok {
-		return 0, fmt.Errorf("the key %s not exit! please check the input", key)
+		return def
 	}
 	result := c.sections[section].keyValue[key]
 	c.lock.Unlock()
 	f, e := strconv.ParseFloat(result, 64)
 	if e != nil {
-		return 0, e
+		return def
 	}
-	return f, nil
+	return f
 }
