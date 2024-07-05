@@ -2,14 +2,13 @@ package xlog
 
 import (
 	"fmt"
+	"github.com/ameamezhou/xiawuyue/xconfig"
 	"log"
 	"os"
 	"runtime"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/xia/xconfig"
 )
 
 var (
@@ -53,8 +52,8 @@ func InitLoger(logFilePath string) {
 }
 
 func InitLogerProject(conf *xconfig.WeConfig) {
-	logPath, _ := conf.GetValue("project", "logpath")
-	projname, _ := conf.GetValue("project", "project")
+	logPath := conf.GetValue("project", "logpath", "")
+	projname := conf.GetValue("project", "project", "")
 	logFile := fmt.Sprintf("%s%s_%s", logPath, projname, time.Now().Format("2006-01-02"))
 	InitLoger(logFile)
 	go func() {

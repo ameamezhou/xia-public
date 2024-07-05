@@ -1,11 +1,11 @@
-package xia
+package xiawuyue
 
 import (
 	"net/http"
 	"path"
 	"strings"
 
-	"github.com/xia/xlog"
+	"github.com/ameamezhou/xiawuyue/xlog"
 )
 
 type HandlerFunc func(c *Context)

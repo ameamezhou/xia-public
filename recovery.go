@@ -1,12 +1,12 @@
-package xia
+package xiawuyue
 
 import (
 	"fmt"
 	"net/http"
 	"runtime"
 	"strings"
+	"github.com/ameamezhou/xiawuyue/xlog"
 
-	"github.com/xia/xlog"
 )
 
 // print stack trace for debug

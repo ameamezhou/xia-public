@@ -1,11 +1,11 @@
-package xia
+package xiawuyue
 
 import (
 	"fmt"
 	"net/http"
 	"testing"
+	"github.com/ameamezhou/xiawuyue/xlog"
 
-	"github.com/xia/xlog"
 )
 
 func TestWebService(t *testing.T) {

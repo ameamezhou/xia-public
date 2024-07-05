@@ -1,3 +1,3 @@
-module github.com/xia
+module github.com/ameamezhou/xiawuyue
 
-go 1.22.2
+go 1.22.0
